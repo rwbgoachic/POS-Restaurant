@@ -1,0 +1,381 @@
+# BistroBeast Restaurant POS Test Configuration
+name: Restaurant POS System Tests
+description: Comprehensive test suite for the BistroBeast restaurant management system
+version: 1.0.0
+
+# Test Categories
+categories:
+  - name: authentication
+    description: Tests for user authentication and authorization
+    priority: high
+    
+  - name: pos-terminal
+    description: Tests for the point of sale terminal functionality
+    priority: high
+    
+  - name: inventory
+    description: Tests for inventory management
+    priority: medium
+    
+  - name: orders
+    description: Tests for order processing and management
+    priority: high
+    
+  - name: payments
+    description: Tests for payment processing
+    priority: critical
+    
+  - name: kitchen-display
+    description: Tests for kitchen display system
+    priority: medium
+    
+  - name: reporting
+    description: Tests for reporting and analytics
+    priority: low
+    
+  - name: devices
+    description: Tests for hardware device integration
+    priority: high
+    
+  - name: offline
+    description: Tests for offline functionality
+    priority: medium
+
+# Test Scenarios
+scenarios:
+  # Authentication Tests
+  - id: auth-login
+    category: authentication
+    name: User Login
+    description: Test user login with valid credentials
+    steps:
+      - action: navigate
+        target: /auth
+      - action: fill
+        target: "[data-testid='email-input']"
+        value: "{{TEST_USER_EMAIL}}"
+      - action: fill
+        target: "[data-testid='password-input']"
+        value: "{{TEST_USER_PASSWORD}}"
+      - action: click
+        target: "[data-testid='login-button']"
+      - action: wait
+        target: "[data-testid='dashboard']"
+        timeout: 5000
+    assertions:
+      - target: "[data-testid='user-name']"
+        condition: contains
+        value: "{{TEST_USER_NAME}}"
+      - target: location.pathname
+        condition: equals
+        value: "/"
+        
+  - id: auth-invalid-login
+    category: authentication
+    name: Invalid Login
+    description: Test login with invalid credentials
+    steps:
+      - action: navigate
+        target: /auth
+      - action: fill
+        target: "[data-testid='email-input']"
+        value: "invalid@example.com"
+      - action: fill
+        target: "[data-testid='password-input']"
+        value: "wrongpassword"
+      - action: click
+        target: "[data-testid='login-button']"
+      - action: wait
+        target: "[data-testid='error-message']"
+        timeout: 3000
+    assertions:
+      - target: "[data-testid='error-message']"
+        condition: contains
+        value: "Invalid credentials"
+      - target: location.pathname
+        condition: equals
+        value: "/auth"
+        
+  # POS Terminal Tests
+  - id: pos-add-item
+    category: pos-terminal
+    name: Add Item to Order
+    description: Test adding an item to the current order
+    steps:
+      - action: navigate
+        target: /pos
+      - action: wait
+        target: "[data-testid='menu-items']"
+        timeout: 5000
+      - action: click
+        target: "[data-testid='menu-item']:first-child"
+      - action: wait
+        target: "[data-testid='cart-items']"
+        timeout: 2000
+    assertions:
+      - target: "[data-testid='cart-items'] [data-testid='cart-item']"
+        condition: count
+        value: 1
+      - target: "[data-testid='cart-total']"
+        condition: exists
+        
+  - id: pos-remove-item
+    category: pos-terminal
+    name: Remove Item from Order
+    description: Test removing an item from the current order
+    steps:
+      - action: navigate
+        target: /pos
+      - action: wait
+        target: "[data-testid='menu-items']"
+        timeout: 5000
+      - action: click
+        target: "[data-testid='menu-item']:first-child"
+      - action: wait
+        target: "[data-testid='cart-items']"
+        timeout: 2000
+      - action: click
+        target: "[data-testid='cart-item']:first-child [data-testid='remove-item']"
+    assertions:
+      - target: "[data-testid='cart-items'] [data-testid='cart-item']"
+        condition: count
+        value: 0
+        
+  - id: pos-complete-order
+    category: pos-terminal
+    name: Complete Order
+    description: Test completing an order with payment
+    steps:
+      - action: navigate
+        target: /pos
+      - action: wait
+        target: "[data-testid='menu-items']"
+        timeout: 5000
+      - action: click
+        target: "[data-testid='menu-item']:first-child"
+      - action: wait
+        target: "[data-testid='cart-items']"
+        timeout: 2000
+      - action: click
+        target: "[data-testid='pay-button']"
+      - action: wait
+        target: "[data-testid='payment-modal']"
+        timeout: 3000
+      - action: click
+        target: "[data-testid='payment-method-cash']"
+      - action: click
+        target: "[data-testid='process-payment']"
+      - action: wait
+        target: "[data-testid='success-message']"
+        timeout: 5000
+    assertions:
+      - target: "[data-testid='success-message']"
+        condition: contains
+        value: "Order completed"
+      - target: "[data-testid='cart-items'] [data-testid='cart-item']"
+        condition: count
+        value: 0
+        
+  # Payment Tests
+  - id: payment-cash
+    category: payments
+    name: Cash Payment
+    description: Test processing a cash payment
+    steps:
+      - action: navigate
+        target: /pos
+      - action: wait
+        target: "[data-testid='menu-items']"
+        timeout: 5000
+      - action: click
+        target: "[data-testid='menu-item']:first-child"
+      - action: wait
+        target: "[data-testid='cart-items']"
+        timeout: 2000
+      - action: click
+        target: "[data-testid='pay-button']"
+      - action: wait
+        target: "[data-testid='payment-modal']"
+        timeout: 3000
+      - action: click
+        target: "[data-testid='payment-method-cash']"
+      - action: click
+        target: "[data-testid='process-payment']"
+      - action: wait
+        target: "[data-testid='success-message']"
+        timeout: 5000
+    assertions:
+      - target: "[data-testid='success-message']"
+        condition: contains
+        value: "Payment processed"
+        
+  - id: payment-card
+    category: payments
+    name: Card Payment
+    description: Test processing a card payment
+    steps:
+      - action: navigate
+        target: /pos
+      - action: wait
+        target: "[data-testid='menu-items']"
+        timeout: 5000
+      - action: click
+        target: "[data-testid='menu-item']:first-child"
+      - action: wait
+        target: "[data-testid='cart-items']"
+        timeout: 2000
+      - action: click
+        target: "[data-testid='pay-button']"
+      - action: wait
+        target: "[data-testid='payment-modal']"
+        timeout: 3000
+      - action: click
+        target: "[data-testid='payment-method-card']"
+      - action: fill
+        target: "[data-testid='card-number']"
+        value: "4242424242424242"
+      - action: fill
+        target: "[data-testid='expiry-month']"
+        value: "12"
+      - action: fill
+        target: "[data-testid='expiry-year']"
+        value: "25"
+      - action: fill
+        target: "[data-testid='cvv']"
+        value: "123"
+      - action: click
+        target: "[data-testid='process-payment']"
+      - action: wait
+        target: "[data-testid='success-message']"
+        timeout: 5000
+    assertions:
+      - target: "[data-testid='success-message']"
+        condition: contains
+        value: "Payment processed"
+        
+  # Inventory Tests
+  - id: inventory-update
+    category: inventory
+    name: Update Inventory
+    description: Test updating inventory levels
+    steps:
+      - action: navigate
+        target: /inventory
+      - action: wait
+        target: "[data-testid='inventory-items']"
+        timeout: 5000
+      - action: click
+        target: "[data-testid='inventory-item']:first-child [data-testid='edit-button']"
+      - action: wait
+        target: "[data-testid='inventory-form']"
+        timeout: 3000
+      - action: clear
+        target: "[data-testid='current-stock']"
+      - action: fill
+        target: "[data-testid='current-stock']"
+        value: "50"
+      - action: click
+        target: "[data-testid='save-button']"
+      - action: wait
+        target: "[data-testid='success-message']"
+        timeout: 3000
+    assertions:
+      - target: "[data-testid='success-message']"
+        condition: contains
+        value: "updated"
+      - target: "[data-testid='inventory-item']:first-child [data-testid='stock-value']"
+        condition: contains
+        value: "50"
+        
+  # Device Tests
+  - id: device-printer-test
+    category: devices
+    name: Test Printer
+    description: Test printer connection and functionality
+    steps:
+      - action: navigate
+        target: /device-settings
+      - action: wait
+        target: "[data-testid='printer-devices']"
+        timeout: 5000
+      - action: click
+        target: "[data-testid='printer-device']:first-child [data-testid='test-button']"
+      - action: wait
+        target: "[data-testid='test-result']"
+        timeout: 5000
+    assertions:
+      - target: "[data-testid='test-result']"
+        condition: contains
+        value: "successful"
+        
+  - id: device-cash-drawer-test
+    category: devices
+    name: Test Cash Drawer
+    description: Test cash drawer connection and functionality
+    steps:
+      - action: navigate
+        target: /device-settings
+      - action: wait
+        target: "[data-testid='cash-drawer-devices']"
+        timeout: 5000
+      - action: click
+        target: "[data-testid='cash-drawer-device']:first-child [data-testid='test-button']"
+      - action: wait
+        target: "[data-testid='test-result']"
+        timeout: 5000
+    assertions:
+      - target: "[data-testid='test-result']"
+        condition: contains
+        value: "successful"
+        
+  # Offline Tests
+  - id: offline-create-order
+    category: offline
+    name: Create Order Offline
+    description: Test creating an order while offline
+    steps:
+      - action: execute
+        script: "window.dispatchEvent(new Event('offline'))"
+      - action: navigate
+        target: /pos
+      - action: wait
+        target: "[data-testid='offline-indicator']"
+        timeout: 3000
+      - action: click
+        target: "[data-testid='menu-item']:first-child"
+      - action: wait
+        target: "[data-testid='cart-items']"
+        timeout: 2000
+      - action: click
+        target: "[data-testid='pay-button']"
+      - action: wait
+        target: "[data-testid='payment-modal']"
+        timeout: 3000
+      - action: click
+        target: "[data-testid='payment-method-cash']"
+      - action: click
+        target: "[data-testid='process-payment']"
+      - action: wait
+        target: "[data-testid='offline-success-message']"
+        timeout: 5000
+      - action: execute
+        script: "window.dispatchEvent(new Event('online'))"
+    assertions:
+      - target: "[data-testid='offline-success-message']"
+        condition: contains
+        value: "stored locally"
+
+# Test Environment Variables
+environment:
+  TEST_USER_EMAIL: "admin@bistrobeast.com"
+  TEST_USER_PASSWORD: "Admin123!"
+  TEST_USER_NAME: "System Administrator"
+  
+# Test Data
+fixtures:
+  - name: menu-items
+    file: test-data/menu-items.json
+  - name: users
+    file: test-data/users.json
+  - name: orders
+    file: test-data/orders.json
