@@ -1,20 +1,13 @@
 {
-  "name": "pos-grocery",
+  "name": "@paysurity/api-middleware",
   "version": "1.0.0",
-  "private": true,
+  "private": false,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "echo \"Building project...\" && exit 0"
   },
   "dependencies": {
-    "next": "latest",
-    "react": "latest",
-    "react-dom": "latest"
-  },
-  "devDependencies": {
-    "@types/node": "22.15.18",
-    "@types/react": "19.1.4",
-    "typescript": "5.8.3"
+    "@paysurity/common-utils": "latest",
+    "express": "^4.18.2"
   }
 }
