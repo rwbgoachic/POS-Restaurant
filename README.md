@@ -1,2 +1,2 @@
-# api-middleware  
-Express + Zod validation helpers; v1.0.0
+# common-utils  
+Core shared utilities (date, HTTP, validation, parsing).

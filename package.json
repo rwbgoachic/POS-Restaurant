@@ -1,13 +1,21 @@
 {
-  "name": "@paysurity/api-middleware",
-  "version": "1.0.0",
+  "name": "@paysurity/common-utils",
   "private": false,
+  "version": "1.0.1",
+  "description": "Node.js starter package with inventory management",
+  "main": "src/inventory/inventoryManager.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "echo \"Building project...\" && exit 0"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "keywords": [
+    "inventory",
+    "management",
+    "node"
+  ],
+  "author": "",
+  "license": "ISC",
   "dependencies": {
-    "@paysurity/common-utils": "latest",
-    "express": "^4.18.2"
+    "winston": "3.11.0",
+    "axios": "1.6.2"
   }
 }
